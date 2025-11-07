@@ -4,7 +4,7 @@ module stream_rx(
     input                   s_rst_n,
     // Stream Rx Interface
     input           [63:0]  s_axis_mm2s_tdata,
-    input           [ 7:0]  s_axis_mm2s_tkeep, // tkeep Ó¦¸ÃÒ²±»´«µİ£¬¼´Ê¹Î´Ê¹ÓÃ
+    input           [ 7:0]  s_axis_mm2s_tkeep, // tkeep åº”è¯¥ä¹Ÿè¢«ä¼ é€’ï¼Œå³ä½¿æœªä½¿ç”¨
     input                   s_axis_mm2s_tvalid,
     output  wire            s_axis_mm2s_tready,
     input                   s_axis_mm2s_tlast,
@@ -28,37 +28,37 @@ localparam      WEIGHT_DATA     = 2'b01;
 localparam      BIAS_DATA       = 2'b10;
 localparam      LEAKYRELU_DATA  = 2'b11;
 
-// ÄÚ²¿Á÷Ë®Ïß¼Ä´æÆ÷
+// å†…éƒ¨æµæ°´çº¿å¯„å­˜å™¨
 reg             internal_vld;
 reg             internal_tlast;
 reg     [63:0]  internal_tdata;
-reg     [ 1:0]  internal_data_type; // Ëø´ædata_typeÒÔ·À´«ÊäÖĞ±ä»¯
+reg     [ 1:0]  internal_data_type; // é”å­˜data_typeä»¥é˜²ä¼ è¾“ä¸­å˜åŒ–
 
 //=============================================================================
 //**************    Main Code   **************
 //=============================================================================
 
-// 1. ¾ö¶¨ºÎÊ±½ÓÊÕÉÏÓÎÊı¾İ
-// µ±Ö÷×´Ì¬ÔÊĞí(state[1]) ²¢ÇÒ ÄÚ²¿Á÷Ë®ÏßÎª¿ÕÏĞÊ±( !internal_vld )£¬ÎÒÃÇ²Å×¼±¸ºÃ½ÓÊÕĞÂÊı¾İ
+// 1. å†³å®šä½•æ—¶æ¥æ”¶ä¸Šæ¸¸æ•°æ®
+// å½“ä¸»çŠ¶æ€å…è®¸(state[1]) å¹¶ä¸” å†…éƒ¨æµæ°´çº¿ä¸ºç©ºé—²æ—¶( !internal_vld )ï¼Œæˆ‘ä»¬æ‰å‡†å¤‡å¥½æ¥æ”¶æ–°æ•°æ®
 assign  s_axis_mm2s_tready = state[1] & !internal_vld;
 
-// 2. Ëø´æÊäÈëÊı¾İµ½ÄÚ²¿Á÷Ë®Ïß¼Ä´æÆ÷
-// µ±ÎÕÊÖ³É¹¦Ê± (tvalid & tready)£¬½«ÊäÈëÊı¾İ´òÈë¼Ä´æÆ÷
+// 2. é”å­˜è¾“å…¥æ•°æ®åˆ°å†…éƒ¨æµæ°´çº¿å¯„å­˜å™¨
+// å½“æ¡æ‰‹æˆåŠŸæ—¶ (tvalid & tready)ï¼Œå°†è¾“å…¥æ•°æ®æ‰“å…¥å¯„å­˜å™¨
 always @(posedge sclk or negedge s_rst_n) begin
     if (s_rst_n == 1'b0) begin
         internal_vld <= 1'b0;
     end else if (s_axis_mm2s_tvalid && s_axis_mm2s_tready) begin
-        internal_vld <= 1'b1; // Êı¾İÓĞĞ§
+        internal_vld <= 1'b1; // æ•°æ®æœ‰æ•ˆ
         internal_tdata <= s_axis_mm2s_tdata;
         internal_tlast <= s_axis_mm2s_tlast;
-        internal_data_type <= data_type; // ÔÚÊı¾İ°ü¿ªÊ¼Ê±Ëø´æÀàĞÍ
+        internal_data_type <= data_type; // åœ¨æ•°æ®åŒ…å¼€å§‹æ—¶é”å­˜ç±»å‹
     end else begin
-        internal_vld <= 1'b0; // ÆäËûÇé¿ö£¬Á÷Ë®Ïß±äÎŞĞ§
+        internal_vld <= 1'b0; // å…¶ä»–æƒ…å†µï¼Œæµæ°´çº¿å˜æ— æ•ˆ
     end
 end
 
-// 3. ¸ù¾İËø´æµÄÊı¾İ²úÉúÊä³ö
-// Êä³öĞÅºÅÏÖÔÚÊÇ¼Ä´æÆ÷Êä³ö£¬ÓĞÃ÷È·µÄÊ±Ğò
+// 3. æ ¹æ®é”å­˜çš„æ•°æ®äº§ç”Ÿè¾“å‡º
+// è¾“å‡ºä¿¡å·ç°åœ¨æ˜¯å¯„å­˜å™¨è¾“å‡ºï¼Œæœ‰æ˜ç¡®çš„æ—¶åº
 always @(posedge sclk or negedge s_rst_n) begin
     if (s_rst_n == 1'b0) begin
         stream_rx_data <= 64'b0;
@@ -66,15 +66,15 @@ always @(posedge sclk or negedge s_rst_n) begin
         stream_weight_vld <= 1'b0;
         stream_bias_vld <= 1'b0;
         stream_leakyrelu_vld <= 1'b0;
-    end else if (internal_vld) begin // µ±ÄÚ²¿¼Ä´æÆ÷ÓĞĞ§Ê±
+    end else if (internal_vld) begin // å½“å†…éƒ¨å¯„å­˜å™¨æœ‰æ•ˆæ—¶
         stream_rx_data <= internal_tdata;
-        // ¸ù¾İËø´æµÄdata_typeÀ´²úÉú¶ÔÓ¦µÄvldĞÅºÅ
+        // æ ¹æ®é”å­˜çš„data_typeæ¥äº§ç”Ÿå¯¹åº”çš„vldä¿¡å·
         stream_feature_vld <= (internal_data_type == FEATURE_DATA) ? 1'b1 : 1'b0;
         stream_weight_vld  <= (internal_data_type == WEIGHT_DATA) ? 1'b1 : 1'b0;
         stream_bias_vld    <= (internal_data_type == BIAS_DATA) ? 1'b1 : 1'b0;
         stream_leakyrelu_vld <= (internal_data_type == LEAKYRELU_DATA) ? 1'b1 : 1'b0;
     end else begin
-        stream_rx_data <= 64'b0; // Ä¬ÈÏÖµ
+        stream_rx_data <= 64'b0; // é»˜è®¤å€¼
         stream_feature_vld <= 1'b0;
         stream_weight_vld <= 1'b0;
         stream_bias_vld <= 1'b0;
@@ -82,8 +82,8 @@ always @(posedge sclk or negedge s_rst_n) begin
     end
 end
 
-// 4. write_finish ĞÅºÅ
-// µ±ÄÚ²¿¼Ä´æÆ÷ÓĞĞ§ÇÒÊÇ×îºóÒ»¸öÊı¾İ°üÊ±£¬²úÉúÍê³ÉĞÅºÅ
+// 4. write_finish ä¿¡å·
+// å½“å†…éƒ¨å¯„å­˜å™¨æœ‰æ•ˆä¸”æ˜¯æœ€åä¸€ä¸ªæ•°æ®åŒ…æ—¶ï¼Œäº§ç”Ÿå®Œæˆä¿¡å·
 assign write_finish = internal_vld & internal_tlast;
 
 

@@ -2,21 +2,21 @@ module LIF #(
     parameter INPUT_WIDTH       = 8,    
     parameter VOLTAGE_WIDTH     = 16,  
     parameter VOLTAGE_FRAC_BITS = 8, 
-    // ãĞÖµÉèÎª1.0
+    // é˜ˆå€¼è®¾ä¸º1.0
     parameter THRESHOLD         = 16'h0100 
 )(
-    // ÏµÍ³ĞÅºÅ
+    // ç³»ç»Ÿä¿¡å·
     input                           clk,
     input                           rst_n,
-    // Êı¾İĞÅºÅ
-    input                           i_valid,        // ÊäÈëÊı¾İÓĞĞ§ĞÅºÅ
-    input      signed [INPUT_WIDTH-1:0]   neuron_in,      // ÊäÈëÊı¾İ£¨ÀıÈç£ºÀ´×Ô¾í»ı²ãµÄÀÛ¼Ó½á¹û£©
-    // Êä³öĞÅºÅ
-    output     reg                    spike_out,      // Êä³öÂö³å (1 ±íÊ¾·¢·Å, 0 ±íÊ¾²»·¢·Å)
-    output     reg                    o_valid         // Êä³öÊı¾İÓĞĞ§ĞÅºÅ
+    // æ•°æ®ä¿¡å·
+    input                           i_valid,        // è¾“å…¥æ•°æ®æœ‰æ•ˆä¿¡å·
+    input      signed [INPUT_WIDTH-1:0]   neuron_in,      // è¾“å…¥æ•°æ®ï¼ˆä¾‹å¦‚ï¼šæ¥è‡ªå·ç§¯å±‚çš„ç´¯åŠ ç»“æœï¼‰
+    // è¾“å‡ºä¿¡å·
+    output     reg                    spike_out,      // è¾“å‡ºè„‰å†² (1 è¡¨ç¤ºå‘æ”¾, 0 è¡¨ç¤ºä¸å‘æ”¾)
+    output     reg                    o_valid         // è¾“å‡ºæ•°æ®æœ‰æ•ˆä¿¡å·
 );
 
-// ÄÚ²¿Ä¤µçÎ»¼Ä´æÆ÷£¬¶¨ÒåÎªÓĞ·ûºÅÊıÒÔ´¦ÀíÕı¸ºµçÑ¹
+// å†…éƒ¨è†œç”µä½å¯„å­˜å™¨ï¼Œå®šä¹‰ä¸ºæœ‰ç¬¦å·æ•°ä»¥å¤„ç†æ­£è´Ÿç”µå‹
 reg   signed [VOLTAGE_WIDTH-1:0]    membrane_potential;
 
 wire  signed [VOLTAGE_WIDTH-1:0]    leaky_potential;
@@ -32,8 +32,8 @@ assign next_membrane_potential = leaky_potential + scaled_input;
 // v = v + (x - v) / tau
 // return v
 
-// --- ÑÓ³Ù¿ØÖÆÂß¼­ ---
-// ´´½¨Ò»¸öÁ½¼¶ÑÓ³ÙµÄÊäÈëÓĞĞ§ĞÅºÅ£¬ÓÃÓÚÍ¬²½Êä³ö
+// --- å»¶è¿Ÿæ§åˆ¶é€»è¾‘ ---
+// åˆ›å»ºä¸€ä¸ªä¸¤çº§å»¶è¿Ÿçš„è¾“å…¥æœ‰æ•ˆä¿¡å·ï¼Œç”¨äºåŒæ­¥è¾“å‡º
 reg i_valid_d1;
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
@@ -46,23 +46,23 @@ always @(posedge clk or negedge rst_n) begin
 end
 
 
-// --- Ä¤µçÎ»¸üĞÂÂß¼­ ---
+// --- è†œç”µä½æ›´æ–°é€»è¾‘ ---
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         membrane_potential <= 'd0;
         spike_out          <= 1'b0;
     end else begin
-        // Ä¬ÈÏÇé¿öÏÂ£¬Âö³åÊä³öÎª0
+        // é»˜è®¤æƒ…å†µä¸‹ï¼Œè„‰å†²è¾“å‡ºä¸º0
         spike_out <= 1'b0;
 
-        if (i_valid_d1) begin // ÔÚÊäÈëÓĞĞ§µÄÏÂÒ»ÅÄ½øĞĞ¼ÆËã
-            // ¼ì²éÉÏÒ»ÖÜÆÚµÄÄ¤µçÎ»ÊÇ·ñ³¬¹ıãĞÖµ
+        if (i_valid_d1) begin // åœ¨è¾“å…¥æœ‰æ•ˆçš„ä¸‹ä¸€æ‹è¿›è¡Œè®¡ç®—
+            // æ£€æŸ¥ä¸Šä¸€å‘¨æœŸçš„è†œç”µä½æ˜¯å¦è¶…è¿‡é˜ˆå€¼
             if (membrane_potential > THRESHOLD) begin
-                // A. ·¢·Å²¢ÖØÖÃ (Fire and Reset)
-                spike_out          <= 1'b1;   // ·¢·ÅÂö³å
-                membrane_potential <= 'd0;     // Ä¤µçÎ»ÖØÖÃÎª0
+                // A. å‘æ”¾å¹¶é‡ç½® (Fire and Reset)
+                spike_out          <= 1'b1;   // å‘æ”¾è„‰å†²
+                membrane_potential <= 'd0;     // è†œç”µä½é‡ç½®ä¸º0
             end else begin
-                // B. Ğ¹Â©²¢»ı·Ö (Leaky and Integrate)
+                // B. æ³„æ¼å¹¶ç§¯åˆ† (Leaky and Integrate)
                 membrane_potential <= next_membrane_potential;
             end
         end

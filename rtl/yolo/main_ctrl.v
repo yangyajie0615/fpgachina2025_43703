@@ -10,8 +10,8 @@ module  main_ctrl(
         // 
         output  wire            read_start              ,       
         output  reg     [ 5:0]  state                   ,
-        output  wire    [ 1:0]  data_type               ,  // weight数据、feature数据�?...    
-        output  wire            conv_type               ,  // 0:3*3卷积  1:1*1卷积      
+        output  wire    [ 1:0]  data_type               ,  // weightæ•°æ®ã€featureæ•°æ®ã€?...    
+        output  wire            conv_type               ,  // 0:3*3å·ç§¯  1:1*1å·ç§¯      
         output  wire    [ 1:0]  site_type               ,  // feature_size    
         output  wire    [ 1:0]  batch_type              ,  //     
         output  wire    [ 2:0]  feature_col_select      ,       
@@ -27,7 +27,7 @@ module  main_ctrl(
         input                   conv_finish             ,
         input                   upsample_finish         ,
         output  wire            task_finish             ,
-        output  wire            weight_store_start      ,  // weight�?始存储标志，从地�?0�?始重新存入数�?
+        output  wire            weight_store_start      ,  // weightå¼?å§‹å­˜å‚¨æ ‡å¿—ï¼Œä»Žåœ°å?0å¼?å§‹é‡æ–°å­˜å…¥æ•°æ?
         output  wire            conv1x1_start           ,         
         output  wire            padding_start           ,
         output  wire            pool_stride             ,

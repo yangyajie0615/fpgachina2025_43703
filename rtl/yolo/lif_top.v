@@ -32,11 +32,11 @@ module lif_top (
 wire                    spike_out_ch0, spike_out_ch1, spike_out_ch2, spike_out_ch3;
 wire                    spike_out_ch4, spike_out_ch5, spike_out_ch6, spike_out_ch7;
 
-// Êä³öÓĞĞ§ĞÅºÅµÄÑÓ³Ù¼Ä´æÆ÷£¬ÓëÔ­Ê¼ leaky_relu Ä£¿éÂß¼­±£³ÖÒ»ÖÂ
+// è¾“å‡ºæœ‰æ•ˆä¿¡å·çš„å»¶è¿Ÿå¯„å­˜å™¨ï¼Œä¸åŸå§‹ leaky_relu æ¨¡å—é€»è¾‘ä¿æŒä¸€è‡´
 reg     [1:0]           data_vld_delay;
 
-// ÎªÁËÓëÔ­Ê¼Éè¼ÆµÄÊ±Ğò±£³ÖÒ»ÖÂ£¬Êä³öÓĞĞ§ĞÅºÅ ch_data_vld_o 
-// ÊÇÊäÈëÓĞĞ§ĞÅºÅ ch_data_vld_i ÑÓ³ÙÁ½¸öÊ±ÖÓÖÜÆÚµÄ½á¹û¡£
+// ä¸ºäº†ä¸åŸå§‹è®¾è®¡çš„æ—¶åºä¿æŒä¸€è‡´ï¼Œè¾“å‡ºæœ‰æ•ˆä¿¡å· ch_data_vld_o 
+// æ˜¯è¾“å…¥æœ‰æ•ˆä¿¡å· ch_data_vld_i å»¶è¿Ÿä¸¤ä¸ªæ—¶é’Ÿå‘¨æœŸçš„ç»“æœã€‚
 always @(posedge sclk or negedge s_rst_n) begin
     if (s_rst_n == 1'b0)
         data_vld_delay <= 2'd0;
@@ -53,7 +53,7 @@ generate
         wire [7:0] current_ch_data_i;
         wire [7:0] current_ch_data_o;
         wire       current_spike_out;
-        // Ê¹ÓÃ case Óï¾ä½«Í¨ÓÃÁ¬ÏßÁ¬½Óµ½¾ßÌåÍ¨µÀ
+        // ä½¿ç”¨ case è¯­å¥å°†é€šç”¨è¿çº¿è¿æ¥åˆ°å…·ä½“é€šé“
         case (i)
             0: begin
                 assign current_ch_data_i = ch0_data_i;
